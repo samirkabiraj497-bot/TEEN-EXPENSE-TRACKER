@@ -9,7 +9,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -26,7 +26,11 @@ const Login = () => {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      if (err.message === 'Network Error' || !err.response) {
+        setError('Network Error: Unable to connect to the server. Check if your API is running or your VITE_API_URL environment variable is correct.');
+      } else {
+        setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -96,6 +100,29 @@ const Login = () => {
           >
             {loading ? 'Signing in...' : 'Sign In'}
             {!loading && <ArrowRight size={18} />}
+          </button>
+          
+          <button 
+            type="button"
+            onClick={async () => {
+              try {
+                setLoading(true);
+                await guestLogin();
+                navigate('/dashboard');
+              } catch (err) {
+                if (err.message === 'Network Error' || !err.response) {
+                  setError('Network Error: Unable to connect to the server. Check if your API is running or your VITE_API_URL environment variable is correct.');
+                } else {
+                  setError(err.response?.data?.message || 'Guest login failed. Please try again.');
+                }
+                setLoading(false);
+              }
+            }}
+            className="btn btn-secondary"
+            disabled={loading}
+            style={{ width: '100%', padding: '14px', fontSize: '1rem', marginTop: '12px', backgroundColor: 'var(--bg-tertiary)' }}
+          >
+            Continue as Guest
           </button>
         </form>
 

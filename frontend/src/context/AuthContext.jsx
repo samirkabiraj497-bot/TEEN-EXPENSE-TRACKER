@@ -54,6 +54,17 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const guestLogin = async () => {
+    const res = await authService.guestLogin();
+    if (res.success && res.data) {
+      setUser(res.data.user);
+      setToken(res.data.token);
+      localStorage.setItem('teenspend_token', res.data.token);
+      localStorage.setItem('teenspend_user', JSON.stringify(res.data.user));
+    }
+    return res;
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -74,6 +85,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        guestLogin,
         logout,
         seedDemoData
       }}

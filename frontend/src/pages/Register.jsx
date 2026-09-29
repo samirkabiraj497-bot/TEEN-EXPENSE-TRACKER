@@ -13,7 +13,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
+  const { register, guestLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -46,7 +46,11 @@ const Register = () => {
       await register({ name, email, password, confirmPassword });
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please check your details.');
+      if (err.message === 'Network Error' || !err.response) {
+        setError('Network Error: Unable to connect to the server. Check if your API is running or your VITE_API_URL environment variable is correct.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please check your details.');
+      }
     } finally {
       setLoading(false);
     }
@@ -146,6 +150,29 @@ const Register = () => {
           >
             {loading ? 'Creating account...' : 'Create Account'}
             {!loading && <ArrowRight size={18} />}
+          </button>
+
+          <button 
+            type="button"
+            onClick={async () => {
+              try {
+                setLoading(true);
+                await guestLogin();
+                navigate('/dashboard');
+              } catch (err) {
+                if (err.message === 'Network Error' || !err.response) {
+                  setError('Network Error: Unable to connect to the server. Check if your API is running or your VITE_API_URL environment variable is correct.');
+                } else {
+                  setError(err.response?.data?.message || 'Guest login failed. Please try again.');
+                }
+                setLoading(false);
+              }
+            }}
+            className="btn btn-secondary"
+            disabled={loading}
+            style={{ width: '100%', padding: '14px', fontSize: '1rem', marginTop: '12px', backgroundColor: 'var(--bg-tertiary)' }}
+          >
+            Continue as Guest
           </button>
         </form>
 

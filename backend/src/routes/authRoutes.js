@@ -8,6 +8,7 @@ const { validateRegisterInput, validateLoginInput } = require('../validators/aut
 // Public routes
 router.post('/register', validateRequest(validateRegisterInput), authController.register);
 router.post('/login', validateRequest(validateLoginInput), authController.login);
+router.post('/guest', authController.guestLogin);
 
 // Protected routes
 router.get('/me', authenticate, authController.getMe);

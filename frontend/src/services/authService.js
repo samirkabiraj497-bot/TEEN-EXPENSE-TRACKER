@@ -11,6 +11,11 @@ const authService = {
     return response.data;
   },
 
+  async guestLogin() {
+    const response = await api.post('/auth/guest');
+    return response.data;
+  },
+
   async getMe() {
     const response = await api.get('/auth/me');
     return response.data;
